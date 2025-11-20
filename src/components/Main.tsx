@@ -1,7 +1,8 @@
 import { useState } from "react";
-import type { Invoice } from "../util/types";
+import { CompanyFilter } from "./CompanyFilter";
 import { ImportButton } from "./ImportButton";
 import { InvoicesGrid } from "./InvoicesGrid";
+import type { Invoice } from "../util/types";
 
 export const Main = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -12,8 +13,9 @@ export const Main = () => {
 
   return (
     <div className="min-h-screen w-full p-6 flex flex-col gap-6 bg-gray-50">
-      <ImportButton handleInvoices={handleInvoices} />
-      {invoices.length > 0 && <InvoicesGrid invoices={invoices} />}
+      <ImportButton />
+      <CompanyFilter handleInvoices={handleInvoices} />
+      <InvoicesGrid handleInvoices={handleInvoices} invoices={invoices} />
     </div>
   );
 };

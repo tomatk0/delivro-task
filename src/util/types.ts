@@ -16,3 +16,10 @@ export type Invoice = {
   invoicedWeight: number;
   invoicedPrice: number;
 };
+
+export type Correction = {
+  id: string;
+  invoicedWeight: number;
+  invoicedPrice: number;
+  updatedAt: string;
+}

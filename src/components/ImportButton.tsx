@@ -1,11 +1,7 @@
 import { useRef, useState } from "react";
 import type { Invoice } from "../util/types";
 
-type ImportButtonProps = {
-  handleInvoices: (invoices: Invoice[]) => void;
-};
-
-export const ImportButton = ({ handleInvoices }: ImportButtonProps) => {
+export const ImportButton = () => {
   const [fileName, setFileName] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -23,8 +19,21 @@ export const ImportButton = ({ handleInvoices }: ImportButtonProps) => {
     setFileName(file.name);
 
     try {
-      const parsed = JSON.parse(text);
-      handleInvoices(parsed as Invoice[]);
+      const parsed = JSON.parse(text) as Invoice[];
+
+      const response = await fetch("http://localhost:5000/invoices", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(parsed),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to upload invoices:", await response.text());
+      } else {
+        console.log("Invoices uploaded successfully:", await response.json());
+      }
     } catch (err) {
       console.error("Invalid JSON:", err);
     }
