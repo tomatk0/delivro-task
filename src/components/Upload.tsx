@@ -37,7 +37,6 @@ export const Upload = ({ handleRefetchData, handlePage }: UploadProps) => {
       if (!response.ok) {
         console.error("Failed to upload invoices:", await response.text());
       } else {
-        console.log("Invoices uploaded successfully:", await response.json());
         handleRefetchData();
         handlePage(1);
       }
