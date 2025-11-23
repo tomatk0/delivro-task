@@ -15,6 +15,7 @@ export type Invoice = {
   };
   invoicedWeight: number;
   invoicedPrice: number;
+  updatedAt?: string;
 };
 
 export type Correction = {
@@ -22,4 +23,16 @@ export type Correction = {
   invoicedWeight: number;
   invoicedPrice: number;
   updatedAt: string;
-}
+};
+
+export type Pagination = {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+export type InvoicesResponse = {
+  data: Invoice[];
+  pagination: Pagination;
+};

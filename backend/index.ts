@@ -45,19 +45,17 @@ const createTables = async () => {
 
 createTables();
 
-
 app.get("/invoices", async (req, res) => {
   try {
-    const { company } = req.query;
+    const { company, page = "1", limit = "40" } = req.query;
+    const pageNum = parseInt(page as string, 10);
+    const pageSize = parseInt(limit as string, 10);
+    const offset = (pageNum - 1) * pageSize;
 
-    let query = `
-      SELECT i.id, i.shipment_id, i.shipment_created_at, i.tracking_number,
-             i.company_id, i.company_name, i.provider, i.mode,
-             i.origin_country, i.destination_country,
-             ic.invoiced_weight, ic.invoiced_price
+    let baseQuery = `
       FROM invoices i
       JOIN LATERAL (
-        SELECT invoiced_weight, invoiced_price
+        SELECT invoiced_weight, invoiced_price, updated_at
         FROM invoice_corrections
         WHERE invoice_id = i.id
         ORDER BY updated_at DESC
@@ -65,14 +63,28 @@ app.get("/invoices", async (req, res) => {
       ) ic ON true
     `;
 
-    const params: string[] = [];
-
+    const params = [];
     if (company) {
-      query += ` WHERE i.company_name ILIKE $1`;
+      baseQuery += ` WHERE i.company_name ILIKE $1`;
       params.push(`%${company}%`);
     }
 
-    query += ` ORDER BY i.shipment_created_at DESC`;
+    const countResult = await pool.query(
+      `SELECT COUNT(*) ${baseQuery}`,
+      params
+    );
+    const totalCount = parseInt(countResult.rows[0].count, 10);
+
+    const query = `
+      SELECT i.id, i.shipment_id, i.shipment_created_at, i.tracking_number,
+             i.company_id, i.company_name, i.provider, i.mode,
+             i.origin_country, i.destination_country,
+             ic.invoiced_weight, ic.invoiced_price, ic.updated_at
+      ${baseQuery}
+      ORDER BY i.shipment_created_at DESC
+      LIMIT $${params.length + 1} OFFSET $${params.length + 2}
+    `;
+    params.push(pageSize, offset);
 
     const result = await pool.query(query, params);
 
@@ -93,15 +105,23 @@ app.get("/invoices", async (req, res) => {
       },
       invoicedWeight: Number(row.invoiced_weight),
       invoicedPrice: Number(row.invoiced_price),
+      updatedAt: row.updated_at,
     }));
 
-    res.json(invoices);
+    res.json({
+      data: invoices,
+      pagination: {
+        total: totalCount,
+        page: pageNum,
+        limit: pageSize,
+        totalPages: Math.ceil(totalCount / pageSize),
+      },
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch invoices" });
   }
 });
-
 
 app.get("/invoices/:id/corrections", async (req, res) => {
   try {

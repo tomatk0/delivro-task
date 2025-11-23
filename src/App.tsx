@@ -1,11 +1,7 @@
-import { Main } from "./components/Main";
+import { Dashboard } from "./components/Dashboard";
 
 function App() {
-  return (
-    <>
-      <Main />
-    </>
-  );
+  return <Dashboard />;
 }
 
 export default App;

@@ -1,7 +1,12 @@
 import { useRef, useState } from "react";
 import type { Invoice } from "../util/types";
 
-export const ImportButton = () => {
+type UploadProps = {
+  handleRefetchData: () => void;
+  handlePage: (page: number) => void;
+};
+
+export const Upload = ({ handleRefetchData, handlePage }: UploadProps) => {
   const [fileName, setFileName] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -33,6 +38,8 @@ export const ImportButton = () => {
         console.error("Failed to upload invoices:", await response.text());
       } else {
         console.log("Invoices uploaded successfully:", await response.json());
+        handleRefetchData();
+        handlePage(1);
       }
     } catch (err) {
       console.error("Invalid JSON:", err);
@@ -43,7 +50,7 @@ export const ImportButton = () => {
     <div className="flex items-center gap-4">
       <button
         onClick={handleClick}
-        className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors w-auto"
+        className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition-colors w-auto cursor-pointer"
       >
         Upload Invoices
       </button>
