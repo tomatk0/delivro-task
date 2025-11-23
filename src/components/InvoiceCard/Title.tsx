@@ -26,7 +26,7 @@ export const Title = ({
       );
       if (!response.ok) throw new Error("Failed to fetch invoices");
       const data = await response.json();
-      handleCorrections(data); //
+      handleCorrections(data);
     } catch (err) {
       console.error(err);
     }

@@ -1,9 +1,5 @@
 import { Router } from "express";
-import {
-  getInvoiceCorrections,
-  getInvoices,
-  postInvoices,
-} from "../controllers/invoices.controller";
+import { getInvoiceCorrections, getInvoices, postInvoices } from "../controllers/invoicesController";
 
 const router = Router();
 
