@@ -31,6 +31,15 @@ export const Invoices = ({
     fetch();
   }, [pagination.page, pagination.limit, filter, refetchData]);
 
+  if (invoices.length === 0) {
+    return (
+      <div className="flex flex-1 justify-center items-center gap-2">
+        <p className="text-xl font-semibold">No Invoices Found</p>
+        <img src="/frown.svg" className="w-6 h-6" />
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
       {invoices.map((invoice) => (
